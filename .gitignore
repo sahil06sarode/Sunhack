@@ -1,0 +1,23 @@
+# Flutter and Dart
+.dart_tool/
+.packages
+.pub/
+build/
+
+# Flutter generated
+.flutter-plugins
+.flutter-plugins-dependencies
+.melos_tool/
+
+# IDE
+.idea/
+.vscode/*.code-workspace
+
+# Firebase and Functions
+functions/lib/
+functions/node_modules/
+functions/.env.local
+
+# OS
+.DS_Store
+Thumbs.db

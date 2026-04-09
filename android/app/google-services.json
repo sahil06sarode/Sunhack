@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "148688965299",
+    "project_id": "sunhack-1e794",
+    "storage_bucket": "sunhack-1e794.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:148688965299:android:150c2292e084ec1d7c2ac6",
+        "android_client_info": {
+          "package_name": "com.sooubh.sunhack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlBaIpQ3JTyBdQYgb_GUmbSU9PVsCZJv0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
