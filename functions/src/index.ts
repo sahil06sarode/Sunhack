@@ -5,6 +5,7 @@ import {onSchedule} from 'firebase-functions/v2/scheduler';
 import * as logger from 'firebase-functions/logger';
 
 import {analyzerAgent} from './agents/analyzer';
+import {requireAuthenticatedUser} from './auth';
 import {cleanerAgent} from './agents/cleaner';
 import {collectorAgent} from './agents/collector';
 import {predictorAgent} from './agents/predictor';
@@ -18,9 +19,25 @@ export const ingestNews = onSchedule('every 15 minutes', async () => {
   await runPipeline('Global');
 });
 
-export const runConflictPipeline = onRequest(async (request, response) => {
+export const runConflictPipeline = onRequest({cors: true}, async (request, response) => {
   try {
-    const region = (request.body?.region as string | undefined) ?? 'Global';
+    if (request.method !== 'POST') {
+      response.status(405).json({ok: false, error: 'Method not allowed'});
+      return;
+    }
+
+    const user = await requireAuthenticatedUser(request, response);
+    if (!user) {
+      return;
+    }
+
+    const inputRegion = request.body?.region;
+    const region =
+      typeof inputRegion === 'string' && inputRegion.trim().length > 0
+        ? inputRegion.trim().slice(0, 60)
+        : 'Global';
+
+    logger.info('runConflictPipeline requested', {uid: user.uid, region});
     const result = await runPipeline(region);
     response.status(200).json({ok: true, ...result});
   } catch (error) {
@@ -29,8 +46,19 @@ export const runConflictPipeline = onRequest(async (request, response) => {
   }
 });
 
-export const createGeminiLiveSession = onRequest(async (_request, response) => {
+export const createGeminiLiveSession = onRequest({cors: true}, async (request, response) => {
   try {
+    if (request.method !== 'POST') {
+      response.status(405).json({error: 'Method not allowed'});
+      return;
+    }
+
+    const user = await requireAuthenticatedUser(request, response);
+    if (!user) {
+      return;
+    }
+
+    logger.info('createGeminiLiveSession requested', {uid: user.uid});
     const session = createLiveSessionResponse();
     response.status(200).json(session);
   } catch (error) {

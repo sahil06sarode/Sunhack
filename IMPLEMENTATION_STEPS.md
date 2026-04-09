@@ -25,6 +25,7 @@ This repository is now scaffolded. Follow these steps in order.
    - `lib/app.dart`
    - `lib/router/app_router.dart`
    - `lib/features/shell/app_shell.dart`
+8. If FlutterFire cannot list projects, run `firebase login --reauth` and retry configure.
 
 ## Phase 2 - Backend multi-agent pipeline
 
@@ -44,8 +45,9 @@ This repository is now scaffolded. Follow these steps in order.
 ## Phase 3 - Run emulators and trigger ingestion
 
 1. From project root run `firebase emulators:start`.
-2. Trigger pipeline manually:
+2. Trigger pipeline manually with Firebase ID token:
    - `POST http://127.0.0.1:5001/YOUR_PROJECT_ID/us-central1/runConflictPipeline`
+   - Header: `Authorization: Bearer <firebase_id_token>`
    - Body: `{"region":"Sudan"}`
 3. Verify Firestore collections update:
    - `articles`
@@ -55,7 +57,7 @@ This repository is now scaffolded. Follow these steps in order.
 ## Phase 4 - Run Flutter app
 
 1. From project root:
-   - `flutter run --dart-define=BACKEND_BASE_URL=http://127.0.0.1:5001/YOUR_PROJECT_ID/us-central1 --dart-define=GEMINI_LIVE_MODEL=models/gemini-live-3.1 --dart-define=GEMINI_API_KEY=YOUR_GEMINI_KEY`
+   - `flutter run --dart-define=BACKEND_BASE_URL=http://127.0.0.1:5001/YOUR_PROJECT_ID/us-central1 --dart-define=GEMINI_LIVE_MODEL=models/gemini-live-3.1`
 2. Navigate through screens:
    - Login (Google)
    - Dashboard
@@ -63,6 +65,7 @@ This repository is now scaffolded. Follow these steps in order.
    - Report
    - Scenarios
    - Alerts
+3. For Android runs, attach a phone with USB debugging or create an emulator in Android Studio Device Manager.
 
 ## Phase 5 - Gemini Live 3.1 voice assistant setup
 
@@ -75,6 +78,16 @@ This repository is now scaffolded. Follow these steps in order.
 4. UI sheet is wired in:
    - `lib/features/voice/presentation/voice_assistant_sheet.dart`
 5. Tap `Ask ConflictSense` FAB and start session.
+
+## API key reference
+
+1. Keep all external-provider secrets in `functions/.env.local`.
+2. Required keys:
+   - `NEWS_API_KEY`
+   - `TAVILY_API_KEY`
+   - `GEMINI_API_KEY`
+3. Never put these secrets in Flutter `--dart-define`.
+4. Firebase Auth ID token is automatically sent by app when calling backend endpoints.
 
 ## Phase 6 - Hackathon polish checklist
 

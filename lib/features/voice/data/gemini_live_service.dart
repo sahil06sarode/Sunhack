@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -28,9 +29,14 @@ class GeminiLiveSessionConfig {
 }
 
 class GeminiLiveService {
-  GeminiLiveService({http.Client? client}) : _client = client ?? http.Client();
+  GeminiLiveService({
+    http.Client? client,
+    FirebaseAuth? auth,
+  })  : _client = client ?? http.Client(),
+        _auth = auth ?? FirebaseAuth.instance;
 
   final http.Client _client;
+  final FirebaseAuth _auth;
   WebSocketChannel? _channel;
 
   final StreamController<String> _transcriptController =
@@ -110,9 +116,22 @@ class GeminiLiveService {
       );
     }
 
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('You must sign in before starting live assistant.');
+    }
+
+    final idToken = await user.getIdToken();
+    if (idToken == null || idToken.isEmpty) {
+      throw Exception('Could not obtain auth token. Please sign in again.');
+    }
+
     final response = await _client.post(
       Uri.parse('$base/createGeminiLiveSession'),
-      headers: {'content-type': 'application/json'},
+      headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $idToken',
+      },
       body: jsonEncode({
         'model': AppConfig.geminiLiveModel,
       }),

@@ -42,6 +42,13 @@ flutterfire configure
 
 This will regenerate `lib/firebase_options.dart` for your project.
 
+If FlutterFire fails to list projects, refresh Firebase CLI auth and retry:
+
+```bash
+firebase login --reauth
+dart pub global run flutterfire_cli:flutterfire configure --project=sunhack-1e794 --platforms=android,ios,macos,web,windows --yes
+```
+
 ### 2.1) Configure Google login for Android
 
 1. In Firebase Console, open Authentication > Sign-in method, then enable Google.
@@ -76,9 +83,28 @@ firebase emulators:start
 ```bash
 flutter run \
   --dart-define=BACKEND_BASE_URL=http://127.0.0.1:5001/YOUR_PROJECT_ID/us-central1 \
-  --dart-define=GEMINI_LIVE_MODEL=models/gemini-live-3.1 \
-  --dart-define=GEMINI_API_KEY=YOUR_GEMINI_KEY
+  --dart-define=GEMINI_LIVE_MODEL=models/gemini-live-3.1
 ```
+
+For Android runs, make sure an Android emulator or physical device is connected. If no emulator exists yet, create one from Android Studio Device Manager.
+
+## API keys and auth wiring
+
+- Keep secret provider keys only in backend env file: `functions/.env.local`
+- Required backend keys:
+  - `NEWS_API_KEY`
+  - `TAVILY_API_KEY`
+  - `GEMINI_API_KEY`
+- Optional backend config:
+  - `GEMINI_TEXT_MODEL`
+  - `GEMINI_LIVE_MODEL`
+  - `RSS_FEEDS`
+- App runtime defines:
+  - `BACKEND_BASE_URL`
+  - `GEMINI_LIVE_MODEL` (optional override)
+- Do not pass provider secrets in Flutter `--dart-define`.
+
+Backend endpoints now require Firebase login token (`Authorization: Bearer <idToken>`). The Flutter app automatically sends this token after Google sign-in.
 
 ## Architecture
 

@@ -1,9 +1,4 @@
 class AppConfig {
-  static const String geminiApiKey = String.fromEnvironment(
-    'GEMINI_API_KEY',
-    defaultValue: '',
-  );
-
   static const String geminiLiveModel = String.fromEnvironment(
     'GEMINI_LIVE_MODEL',
     defaultValue: 'models/gemini-live-3.1',
