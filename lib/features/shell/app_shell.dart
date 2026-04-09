@@ -19,61 +19,43 @@ class AppShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateProvider).valueOrNull;
     final authAction = ref.watch(authControllerProvider);
-    final avatarSeed = (user?.displayName ?? user?.email ?? '').trim();
-    final avatarInitial = avatarSeed.isEmpty
-        ? '?'
-        : avatarSeed.substring(0, 1).toUpperCase();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('ConflictSense AI'),
         actions: [
+          IconButton(
+            tooltip: 'Voice assistant',
+            onPressed: () {
+              showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) => const VoiceAssistantSheet(),
+              );
+            },
+            icon: const Icon(Icons.mic),
+          ),
           if (user != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircleAvatar(
-                    radius: 16,
-                    foregroundImage:
-                        user.photoURL != null ? NetworkImage(user.photoURL!) : null,
-                    child: user.photoURL == null ? Text(avatarInitial) : null,
-                  ),
-                  IconButton(
-                    tooltip: 'Sign out',
-                    onPressed: authAction.isLoading
-                        ? null
-                        : () async {
-                            await ref.read(authControllerProvider.notifier).signOut();
+            IconButton(
+              tooltip: 'Sign out',
+              onPressed: authAction.isLoading
+                  ? null
+                  : () async {
+                      await ref.read(authControllerProvider.notifier).signOut();
 
-                            if (!context.mounted) return;
-                            final latest = ref.read(authControllerProvider);
-                            if (latest.hasError) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Sign out failed.')),
-                              );
-                            }
-                          },
-                    icon: const Icon(Icons.logout_rounded),
-                  ),
-                ],
-              ),
+                      if (!context.mounted) return;
+                      final latest = ref.read(authControllerProvider);
+                      if (latest.hasError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Sign out failed.')),
+                        );
+                      }
+                    },
+              icon: const Icon(Icons.logout),
             ),
         ],
       ),
       body: child,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showModalBottomSheet<void>(
-            context: context,
-            isScrollControlled: true,
-            builder: (_) => const VoiceAssistantSheet(),
-          );
-        },
-        icon: const Icon(Icons.mic),
-        label: const Text('Ask ConflictSense'),
-      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _indexForLocation(currentLocation),
         onDestinationSelected: (index) {

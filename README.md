@@ -68,15 +68,20 @@ flutter create .
 cd functions
 npm install
 cp .env.example .env.local
+cd ..
 ```
 
 Set keys in `functions/.env.local`.
 
 ### 4) Run Firebase emulators
 
+Run this command from project root (not from `functions/`):
+
 ```bash
 firebase emulators:start
 ```
+
+If you see `User code failed to load... Timeout after 10000`, ensure you are running `firebase ...` commands from the project root that contains `firebase.json`.
 
 ### 5) Run Flutter app
 

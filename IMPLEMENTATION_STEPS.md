@@ -33,23 +33,25 @@ This repository is now scaffolded. Follow these steps in order.
 2. Run `cd functions`.
 3. Run `npm install`.
 4. Run `npm run build`.
-5. Pipeline flow (already implemented):
+5. Return to project root before Firebase commands: `cd ..`.
+6. Pipeline flow (already implemented):
    - Collector: `functions/src/agents/collector.ts`
    - Cleaner: `functions/src/agents/cleaner.ts`
    - Analyzer: `functions/src/agents/analyzer.ts`
    - Predictor: `functions/src/agents/predictor.ts`
    - Reporter: `functions/src/agents/reporter.ts`
-6. Orchestration entrypoint:
+7. Orchestration entrypoint:
    - `functions/src/index.ts`
 
 ## Phase 3 - Run emulators and trigger ingestion
 
 1. From project root run `firebase emulators:start`.
-2. Trigger pipeline manually with Firebase ID token:
+2. If Firebase reports `User code failed to load... Timeout after 10000`, verify you are not inside `functions/` when running `firebase` commands.
+3. Trigger pipeline manually with Firebase ID token:
    - `POST http://127.0.0.1:5001/YOUR_PROJECT_ID/us-central1/runConflictPipeline`
    - Header: `Authorization: Bearer <firebase_id_token>`
    - Body: `{"region":"Sudan"}`
-3. Verify Firestore collections update:
+4. Verify Firestore collections update:
    - `articles`
    - `riskSnapshots`
    - `reports`
