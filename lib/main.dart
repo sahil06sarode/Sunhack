@@ -1,70 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:conflictsense/firebase_options.dart';
+import 'package:conflictsense/screens/dashboard_screen.dart';
+import 'package:conflictsense/screens/login_screen.dart';
+import 'package:conflictsense/screens/onboarding_screen.dart';
 
-import 'package:conflictsense/screens/alerts_screen.dart';
-import 'package:conflictsense/screens/heatmap_screen.dart';
-import 'package:conflictsense/screens/home_screen.dart';
-import 'package:conflictsense/screens/profile_screen.dart';
-import 'package:conflictsense/screens/result_screen.dart';
-import 'package:conflictsense/screens/source_screen.dart';
-import 'package:conflictsense/screens/simulation_screen.dart';
-import 'package:conflictsense/theme/app_theme.dart';
-
-const bool _useDarkDesign = bool.fromEnvironment(
-  'SOVEREIGN_DARK',
-  defaultValue: false,
-);
-
-const String _designScreen = String.fromEnvironment(
-  'SOVEREIGN_SCREEN',
-  defaultValue: 'profile',
-);
-
-void main() {
-  runApp(const SovereignApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await dotenv.load(fileName: ".env");
+    debugPrint("✅ load .env file successfully.");
+  } catch (e) {
+    debugPrint("❌ Failed to load .env file: $e");
+  }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const ConflictSenseApp());
 }
 
-class SovereignApp extends StatelessWidget {
-  const SovereignApp({super.key});
-
-  Widget get _homeScreen {
-    final selectedScreen = _designScreen.toLowerCase();
-
-    if (selectedScreen == 'home') {
-      return const HomeScreen(useDark: _useDarkDesign);
-    }
-
-    if (selectedScreen == 'simulation') {
-      return const SimulationScreen(useDark: _useDarkDesign);
-    }
-
-    if (selectedScreen == 'result') {
-      return const ResultScreen(useDark: _useDarkDesign);
-    }
-
-    if (selectedScreen == 'alerts') {
-      return const AlertsScreen(useDark: _useDarkDesign);
-    }
-
-    if (selectedScreen == 'heatmap') {
-      return const HeatmapScreen(useDark: _useDarkDesign);
-    }
-
-    if (selectedScreen == 'source') {
-      return const SourceScreen(useDark: _useDarkDesign);
-    }
-
-    return const ProfileScreen(useDark: _useDarkDesign);
-  }
+class ConflictSenseApp extends StatelessWidget {
+  const ConflictSenseApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Sovereign Mobile App',
+      title: 'ConflictSense AI',
       debugShowCheckedModeBanner: false,
-      theme: SovereignAppTheme.light,
-      darkTheme: SovereignAppTheme.dark,
-      themeMode: _useDarkDesign ? ThemeMode.dark : ThemeMode.light,
-      home: _homeScreen,
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primaryColor: const Color(0xFF0F4C81), // Professional deep blue
+        scaffoldBackgroundColor: const Color(0xFFF4F6F8), // Soft light grey background
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black87,
+          elevation: 1,
+          centerTitle: true,
+        ),
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const Color(0xFF0F4C81),
+          secondary: const Color(0xFFE38A3A),
+        ),
+      ),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
+          final user = snapshot.data;
+          
+          if (user == null) {
+            return const LoginScreen();
+          }
+
+          // User is logged in, check if they completed onboarding
+          return FutureBuilder<DocumentSnapshot>(
+            future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
+            builder: (context, docSnapshot) {
+              if (docSnapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              }
+              
+              if (docSnapshot.hasData && docSnapshot.data!.exists) {
+                final data = docSnapshot.data!.data() as Map<String, dynamic>;
+                if (data['onboardingComplete'] == true) {
+                  return const IntelligenceDashboard();
+                }
+              }
+              
+              return const OnboardingScreen();
+            },
+          );
+        },
+      ),
     );
   }
 }

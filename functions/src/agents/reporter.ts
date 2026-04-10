@@ -1,46 +1,77 @@
-import crypto from 'node:crypto';
+import { AnalyzedArticle, RiskAnalysis, IntelligenceReport } from '../types';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-import {AnalyzedArticle, Prediction, ReportResult} from '../types';
+const API_KEY = process.env.GEMINI_API_KEY || "YOUR_TEST_API_KEY_HERE";
+const genAI = new GoogleGenerativeAI(API_KEY);
 
-export function reporterAgent(
-  region: string,
-  analyzedArticles: AnalyzedArticle[],
-  prediction: Prediction,
-): ReportResult {
-  const negativeCount = analyzedArticles.filter(
-    (item) => item.sentiment === 'negative',
-  ).length;
+/**
+ * Agent 5: Reporter
+ * Translates risk data into explainable AI insights, sourcing, and what-if simulation using Gemini.
+ */
+export async function runReporterAgent(
+  analysis: RiskAnalysis, 
+  articles: AnalyzedArticle[]
+): Promise<IntelligenceReport> {
+  console.log(`[Reporter Agent] Compiling final intelligence report via Gemini for ${analysis.primaryLocation}...`);
 
-  const summary =
-    `${prediction.riskLevel} risk detected for ${region}. ` +
-    `${analyzedArticles.length} relevant articles processed with ` +
-    `${negativeCount} negative sentiment signals.`;
+  const sources = articles.map(a => a.url);
 
-  const analysis =
-    `Risk score is ${prediction.riskScore}/100. ` +
-    `Score combines article volume, negative sentiment ratio, event severity, and short-term trend velocity. ` +
-    `Forecast indicates: ${prediction.forecast24h}`;
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-  const explainability = [
-    `${analyzedArticles.length} conflict-relevant articles in active window`,
-    `${Math.round((negativeCount / Math.max(1, analyzedArticles.length)) * 100)}% negative sentiment ratio`,
-    `Event severity weighted average influences 30% of risk score`,
-    `Trend velocity contributes 15% based on recent publication spikes`,
-  ];
+    // Payload compression
+    const inputDataStr = JSON.stringify({
+      location: analysis.primaryLocation,
+      riskLevel: analysis.riskLevel,
+      score: analysis.riskScore,
+      events: Object.keys(analysis.eventTypes),
+      articleSample: articles.slice(0, 3).map(a => a.headline) // First 3 headlines
+    });
 
-  const scenario =
-    prediction.riskLevel === 'High' || prediction.riskLevel === 'Critical'
-      ? 'If escalation continues, displacement pressure and access disruption are likely to increase.'
-      : 'If de-escalation narratives strengthen, risk may drop one tier in the next cycle.';
+    const prompt = `
+    You are the final Reporter Agent in an Autonomous Intelligence System.
+    Analyze this raw intelligence payload: ${inputDataStr}
 
-  return {
-    id: crypto.randomUUID(),
-    region,
-    summary,
-    analysis,
-    explainability,
-    scenario,
-    sources: analyzedArticles.map((item) => item.url).slice(0, 20),
-    createdAt: new Date().toISOString(),
-  };
+    Perform three actions in your response:
+    1. Write a professional, concise executive 1-paragraph summary (3 sentences max) detailing the current situation.
+    2. Write an explicit "What-If" scenario simulation projecting what could happen in the next 24-48 hours.
+    3. Provide exactly two concise bullet points explaining why the risk score is what it is (Explainability).
+
+    Reply exclusively in this JSON structure:
+    {
+      "summary": "...",
+      "simulation": "...",
+      "explainability": ["point 1", "point 2"]
+    }
+    `;
+
+    const response = await model.generateContent(prompt);
+    const outputText = response.response.text();
+    
+    const jsonStart = outputText.indexOf('{');
+    const jsonEnd = outputText.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) throw new Error("No JSON found in response.");
+    
+    const jsonStr = outputText.substring(jsonStart, jsonEnd + 1);
+    const parsed = JSON.parse(jsonStr);
+
+    return {
+      timestamp: new Date().toISOString(),
+      analysis,
+      summary: parsed.summary || "Summary Unavailable.",
+      explainability: parsed.explainability || ["System detected standard baseline."],
+      simulation: parsed.simulation || "Scenario data insufficient.",
+      sources
+    };
+  } catch (e) {
+    console.error("[Reporter Agent] Failed to generate AI report, using generic fallback.", e);
+    return {
+      timestamp: new Date().toISOString(),
+      analysis,
+      summary: `At the present moment, ${analysis.primaryLocation} is experiencing a ${analysis.riskLevel} risk level based on ${analysis.totalAnalyzed} events.`,
+      explainability: ["Elevated risk score calculated mechanically based on data volume."],
+      simulation: "Monitoring baseline trends for escalation.",
+      sources
+    };
+  }
 }

@@ -1,94 +1,63 @@
-import {AnalyzedArticle, Prediction} from '../types';
+import { AnalyzedArticle, RiskAnalysis } from '../types';
 
-export function predictorAgent(
-  region: string,
-  analyzedArticles: AnalyzedArticle[],
-): Prediction {
-  if (analyzedArticles.length < 3) {
-    return {
-      region,
-      riskScore: 35,
-      riskLevel: 'Low',
-      confidence: 42,
-      forecast24h: 'Not enough data to estimate escalation confidently.',
-      forecast48h: 'Collect more signals before directional forecast.',
-      civilianImpact: 'Low',
-      uncertaintyFlag: true,
-    };
+/**
+ * Agent 4: Predictor
+ * Calculates risk levels based on aggregated event types, sentiment ratio, and volume.
+ * Provides basic prediction logic for the pipeline.
+ */
+export async function runPredictorAgent(analyzedSet: AnalyzedArticle[]): Promise<RiskAnalysis> {
+  console.log(`[Predictor Agent] Calculating risk based on ${analyzedSet.length} analyzed events...`);
+
+  // Basic prediction heuristic
+  // Weighting params based on negative sentiment & event types
+  let riskScore = 0;
+  const eventTypesCount: Record<string, number> = {};
+  
+  if (analyzedSet.length === 0) {
+     return {
+      riskLevel: 'LOW',
+      riskScore: 0,
+      confidence: 1.0,
+      totalAnalyzed: 0,
+      eventTypes: {},
+      primaryLocation: 'Unknown',
+     };
   }
 
-  const volumeScore = Math.min(100, analyzedArticles.length * 4);
+  let negativeCount = 0;
 
-  const negativeRatio =
-    analyzedArticles.filter((item) => item.sentiment === 'negative').length /
-    analyzedArticles.length;
-  const negativeSentimentScore = Math.min(100, negativeRatio * 100);
+  for (const item of analyzedSet) {
+    if (item.sentiment === 'negative') negativeCount++;
+    eventTypesCount[item.eventType] = (eventTypesCount[item.eventType] || 0) + 1;
+    
+    // Core event weight
+    if (item.eventType === 'clash') riskScore += 20;
+    else if (item.eventType === 'protest') riskScore += 10;
+    else if (item.eventType === 'tension') riskScore += 5;
+    else if (item.eventType === 'ceasefire') riskScore -= 10;
+  }
 
-  const averageSeverity =
-    analyzedArticles.reduce((sum, item) => sum + item.eventSeverity, 0) /
-    analyzedArticles.length;
+  // Volume & Trend Velocity Weight multiplier check
+  const negRatio = negativeCount / analyzedSet.length;
+  if (negRatio > 0.5) riskScore += 15;
+  if (analyzedSet.length > 5) riskScore += 10;
 
-  const trendVelocityScore = computeTrendVelocity(analyzedArticles);
+  // Clamp limits 0-100
+  riskScore = Math.max(0, Math.min(100, riskScore));
 
-  const riskScore =
-    volumeScore * 0.3 +
-    negativeSentimentScore * 0.25 +
-    averageSeverity * 0.3 +
-    trendVelocityScore * 0.15;
+  let riskLevel: RiskAnalysis['riskLevel'] = 'LOW';
+  if (riskScore >= 75) riskLevel = 'CRITICAL';
+  else if (riskScore >= 50) riskLevel = 'HIGH';
+  else if (riskScore >= 25) riskLevel = 'MEDIUM';
 
-  const boundedScore = Math.round(Math.max(0, Math.min(100, riskScore)));
+  const confidence = analyzedSet.length < 3 ? 0.4 : 0.85;
 
   return {
-    region,
-    riskScore: boundedScore,
-    riskLevel: riskLevelFromScore(boundedScore),
-    confidence: Math.round(Math.min(95, 50 + analyzedArticles.length * 1.2)),
-    forecast24h: forecast24hFromScore(boundedScore),
-    forecast48h: forecast48hFromScore(boundedScore),
-    civilianImpact: civilianImpactFromScore(boundedScore),
-    uncertaintyFlag: false,
+    riskLevel,
+    riskScore,
+    confidence, // Based on dataset size or ML certainty
+    totalAnalyzed: analyzedSet.length,
+    eventTypes: eventTypesCount,
+    primaryLocation: analyzedSet[0]?.location || 'Global Context', // Usually aggregated by region in production
   };
-}
-
-function computeTrendVelocity(articles: AnalyzedArticle[]): number {
-  const timestamps = articles
-    .map((item) => new Date(item.publishedAt).getTime())
-    .sort((a, b) => b - a);
-
-  if (timestamps.length < 2) {
-    return 30;
-  }
-
-  const latestWindow = timestamps.filter(
-    (time) => Date.now() - time < 2 * 60 * 60 * 1000,
-  ).length;
-
-  return Math.min(100, latestWindow * 20);
-}
-
-function riskLevelFromScore(score: number): Prediction['riskLevel'] {
-  if (score >= 80) return 'Critical';
-  if (score >= 60) return 'High';
-  if (score >= 35) return 'Medium';
-  return 'Low';
-}
-
-function civilianImpactFromScore(score: number): Prediction['civilianImpact'] {
-  if (score >= 70) return 'High';
-  if (score >= 40) return 'Medium';
-  return 'Low';
-}
-
-function forecast24hFromScore(score: number): string {
-  if (score >= 80) return 'High probability of escalation in next 24 hours.';
-  if (score >= 60) return 'Localized escalation likely in next 24 hours.';
-  if (score >= 35) return 'Moderate instability expected in next 24 hours.';
-  return 'No major escalation signal in next 24 hours.';
-}
-
-function forecast48hFromScore(score: number): string {
-  if (score >= 80) return 'Sustained high instability expected over 48 hours.';
-  if (score >= 60) return 'Escalation may spread regionally over 48 hours.';
-  if (score >= 35) return 'Mixed signals with possible flare-ups over 48 hours.';
-  return 'Risk appears contained over 48 hours.';
 }

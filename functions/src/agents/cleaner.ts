@@ -1,53 +1,36 @@
-import crypto from 'node:crypto';
+import { RawArticle, CleanArticle } from '../types';
 
-import {CleanArticle, RawArticle} from '../types';
+/**
+ * Agent 2: Cleaner
+ * Removes duplicates, filters noise, formats data.
+ */
+export async function runCleanerAgent(articles: RawArticle[]): Promise<CleanArticle[]> {
+  console.log(`[Cleaner Agent] Processing ${articles.length} raw articles...`);
 
-const WATCH_KEYWORDS = [
-  'protest',
-  'clash',
-  'violence',
-  'airstrike',
-  'tension',
-  'militant',
-  'displacement',
-  'ceasefire',
-  'curfew',
-];
+  // Simple deduplication based on Headline (could use embeddings or URL hashes in production)
+  const dedupedMap: Record<string, CleanArticle> = {};
+  
+  // Basic keyword blocklist for noise filtering (spam, tech news, etc). 
+  // We want to KEEP protest, violence, tension, conflict, etc.
+  const NOISE_WORDS = ['deal', 'sale', 'tech review']; 
 
-export function cleanerAgent(rawArticles: RawArticle[]): CleanArticle[] {
-  const seen = new Set<string>();
+  for (const article of articles) {
+    const isNoise = NOISE_WORDS.some(w => article.headline.toLowerCase().includes(w));
+    if (isNoise) continue; // Filter out noise
+    
+    // Hash could be derived via SHA256 of title + body
+    const hashLabel = article.headline.trim().toLowerCase(); 
 
-  return rawArticles
-    .map((article) => {
-      const cleanedText = `${article.headline} ${article.snippet}`
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-      const fingerprint = crypto
-        .createHash('sha256')
-        .update(`${article.url}:${article.headline.toLowerCase()}`)
-        .digest('hex');
-
-      if (seen.has(fingerprint)) {
-        return null;
-      }
-
-      seen.add(fingerprint);
-
-      const keywords = WATCH_KEYWORDS.filter((keyword) =>
-        cleanedText.toLowerCase().includes(keyword),
-      );
-
-      if (keywords.length === 0) {
-        return null;
-      }
-
-      return {
+    if (!dedupedMap[hashLabel]) {
+      dedupedMap[hashLabel] = {
         ...article,
-        cleanedText,
-        keywords,
-      } as CleanArticle;
-    })
-    .filter((item): item is CleanArticle => item !== null);
+        hash: hashLabel
+      };
+    }
+  }
+
+  const cleanArticles = Object.values(dedupedMap);
+  console.log(`[Cleaner Agent] Retained ${cleanArticles.length} unique, relevant articles.`);
+  
+  return cleanArticles;
 }
