@@ -21,7 +21,8 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
         final AuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
@@ -29,7 +30,9 @@ class _LoginScreenState extends State<LoginScreen> {
         await FirebaseAuth.instance.signInWithCredential(credential);
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google Sign-In Error: $e')));
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Google Sign-In Error: $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -44,14 +47,16 @@ class _LoginScreenState extends State<LoginScreen> {
           password: _passwordController.text.trim(),
         );
       } else {
-        UserCredential cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential cred =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
         await cred.user?.updateDisplayName(_nameController.text.trim());
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -86,13 +91,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Icon(Icons.public, size: 64, color: Color(0xFF0F4C81)),
                   const SizedBox(height: 16),
                   const Text(
-                    "ConflictSense AI",
+                    "IntelNova",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black87, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+                    style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _isLogin ? "Secure portal for intelligence operatives" : "Initialize new analyst profile",
+                    _isLogin
+                        ? "Secure portal for intelligence operatives"
+                        : "Initialize new analyst profile",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey[600], fontSize: 14),
                   ),
@@ -106,8 +117,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         labelStyle: TextStyle(color: Colors.grey[600]),
                         filled: true,
                         fillColor: const Color(0xFFF8F9FA),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -120,8 +134,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       labelStyle: TextStyle(color: Colors.grey[600]),
                       filled: true,
                       fillColor: const Color(0xFFF8F9FA),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -134,8 +151,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       labelStyle: TextStyle(color: Colors.grey[600]),
                       filled: true,
                       fillColor: const Color(0xFFF8F9FA),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -146,11 +166,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: _isLoading 
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : Text(_isLogin ? "AUTHENTICATE" : "REGISTER PROFILE", style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
+                        : Text(_isLogin ? "AUTHENTICATE" : "REGISTER PROFILE",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5)),
                   ),
                   const SizedBox(height: 16),
                   const Row(
@@ -158,7 +186,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       Expanded(child: Divider()),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text("OR", style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                        child: Text("OR",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                       ),
                       Expanded(child: Divider()),
                     ],
@@ -170,19 +202,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg',
                       height: 20,
                     ),
-                    label: const Text("Continue with Google", style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600)),
+                    label: const Text("Continue with Google",
+                        style: TextStyle(
+                            color: Colors.black87,
+                            fontWeight: FontWeight.w600)),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: BorderSide(color: Colors.grey.shade300),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () => setState(() => _isLogin = !_isLogin),
                     child: Text(
-                      _isLogin ? "Request analyst access" : "Return to authentication",
-                      style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w500),
+                      _isLogin
+                          ? "Request analyst access"
+                          : "Return to authentication",
+                      style: TextStyle(
+                          color: Colors.grey[700], fontWeight: FontWeight.w500),
                     ),
                   ),
                 ],

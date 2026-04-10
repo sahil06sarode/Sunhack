@@ -21,7 +21,7 @@ class AppShell extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ConflictSense AI'),
+        title: const Text('IntelNova'),
         actions: [
           if (user != null)
             IconButton(

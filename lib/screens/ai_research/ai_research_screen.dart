@@ -13,6 +13,7 @@ import 'package:conflictsense/screens/ai_research/widgets/feed_card.dart';
 import 'package:conflictsense/screens/ai_research/widgets/prompt_chips.dart';
 import 'package:conflictsense/screens/ai_research/widgets/simulation_card.dart';
 import 'package:conflictsense/screens/feed_screen.dart';
+import 'package:conflictsense/screens/profile_screen.dart';
 import 'package:conflictsense/theme/app_visual_theme.dart';
 
 class AIResearchScreen extends StatefulWidget {
@@ -514,6 +515,15 @@ class _AIResearchScreenState extends State<AIResearchScreen> {
       return;
     }
 
+    if (index == 4) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => const UserProfileScreen(),
+        ),
+      );
+      return;
+    }
+
     final label = _bottomTabs[index].label;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -874,7 +884,7 @@ class _AppLogo extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Text(
-          'ConflictSense',
+          'IntelNova',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: AppVisualTheme.ink,
                 fontWeight: FontWeight.w800,

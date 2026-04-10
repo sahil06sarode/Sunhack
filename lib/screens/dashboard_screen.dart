@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:conflictsense/screens/ai_research/ai_research_screen.dart';
 import 'package:conflictsense/screens/feed_screen.dart';
+import 'package:conflictsense/screens/profile_screen.dart';
 import 'package:conflictsense/theme/app_visual_theme.dart';
 
 class IntelligenceDashboard extends StatefulWidget {
@@ -193,6 +194,15 @@ class _IntelligenceDashboardState extends State<IntelligenceDashboard> {
       return;
     }
 
+    if (index == 4) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const UserProfileScreen(),
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _selectedTab = index;
     });
@@ -317,7 +327,7 @@ class _AppLogo extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Text(
-          'ConflictSense',
+          'IntelNova',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: AppVisualTheme.ink,
                 fontWeight: FontWeight.w800,

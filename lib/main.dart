@@ -41,7 +41,7 @@ class ConflictSenseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ConflictSense AI',
+      title: 'IntelNova',
       debugShowCheckedModeBanner: false,
       theme: AppVisualTheme.lightTheme(),
       home: StreamBuilder<User?>(

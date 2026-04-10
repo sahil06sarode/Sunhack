@@ -6,6 +6,7 @@ import 'package:conflictsense/screens/feed/feed_detail_page.dart';
 import 'package:conflictsense/screens/feed/models/feed_item.dart';
 import 'package:conflictsense/screens/feed/widgets/category_chips.dart';
 import 'package:conflictsense/screens/feed/widgets/feed_card.dart';
+import 'package:conflictsense/screens/profile_screen.dart';
 import 'package:conflictsense/theme/app_visual_theme.dart';
 
 class LiveFeedScreen extends StatelessWidget {
@@ -111,6 +112,15 @@ class _FeedScreenState extends State<FeedScreen> {
     }
 
     if (index == 3) {
+      return;
+    }
+
+    if (index == 4) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => const UserProfileScreen(),
+        ),
+      );
       return;
     }
 
