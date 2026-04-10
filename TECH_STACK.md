@@ -7,7 +7,6 @@
 - State Management: flutter_riverpod
 - Navigation: go_router
 - Networking: http
-- Realtime Transport: web_socket_channel
 - Data/Utilities: collection, intl
 - Charts and Maps: fl_chart, google_maps_flutter
 - AI SDK (client-side): google_generative_ai
@@ -21,13 +20,11 @@
 - firebase_database
 - firebase_messaging
 
-## Backend (Cloud Functions)
-- Platform: Firebase Cloud Functions (2nd Gen)
-- Runtime: Node.js 20
-- Language: TypeScript 5.7.2
-- TS Compiler Settings: strict=true, target=es2022, module=commonjs
-- Core Packages: firebase-admin 12.7.0, firebase-functions 6.1.0
-- Backend Tooling: ESLint 9.x, @types/node 22.x
+## Intelligence Pipeline Runtime
+- Pipeline location: Flutter client (in-app execution)
+- Language: Dart
+- Storage and sync: Cloud Firestore
+- Authentication: Firebase Authentication
 
 ## Data, Auth, and Messaging
 - Cloud Firestore
@@ -47,10 +44,6 @@
 - Flutter CLI
 - FlutterFire CLI
 - Firebase CLI
-- Firebase Emulator Suite
-- npm
-- TypeScript Compiler (tsc)
-- ESLint
 - flutter_lints
 - flutter_test
 

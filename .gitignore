@@ -13,10 +13,7 @@ build/
 .idea/
 .vscode/*.code-workspace
 
-# Firebase and Functions
-functions/lib/
-functions/node_modules/
-functions/.env.local
+# Firebase
 
 # OS
 .DS_Store
@@ -24,3 +21,5 @@ Thumbs.db
 
 
 .env
+.env.local
+.env.*.local

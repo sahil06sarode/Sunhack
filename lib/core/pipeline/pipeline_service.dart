@@ -9,15 +9,32 @@ import 'predictor_agent.dart';
 import 'reporter_agent.dart';
 
 class IntelligencePipelineService {
-  static String get apiKey =>
-      dotenv.env['GEMINI_API_KEY'] ?? '';
+  static const String _envFileName = '.env';
+  static const String _placeholderGeminiKey = 'YOUR_TEST_API_KEY_HERE';
+
+  static Future<void> _refreshEnv() async {
+    try {
+      await dotenv.load(fileName: _envFileName);
+    } catch (_) {
+      // Keep existing dotenv state if loading fails so callers get a clear key-validation error next.
+    }
+  }
+
+  static Future<String> _requireGeminiApiKey() async {
+    await _refreshEnv();
+    final key = (dotenv.env['GEMINI_API_KEY'] ?? '').trim();
+    if (key.isEmpty || key == _placeholderGeminiKey) {
+      throw Exception(
+        'Gemini API key is missing or invalid. Update GEMINI_API_KEY in .env and fully restart the app.',
+      );
+    }
+    return key;
+  }
 
   /// EXECUTING CORE PIPELINE
   static Future<IntelligenceReport> executeCorePipeline(
       [String query = 'global conflict']) async {
-    if (apiKey.isEmpty || apiKey == 'YOUR_TEST_API_KEY_HERE') {
-      throw Exception("Gemini API key is missing or invalid. Check your .env file!");
-    }
+    await _requireGeminiApiKey();
     
     print('[Pipeline] Initiating Core Pipeline Execution...');
 
@@ -28,25 +45,23 @@ class IntelligencePipelineService {
     final intelligenceReport =
         await ReporterAgent.runReporterAgent(riskAnalysis, analyzedArticles);
 
-    // Save report to Firestore to sync with FeedScreen and the rest of the application
+    // Persist report in Firebase Firestore (database of record for feed/query context).
     try {
       await FirebaseFirestore.instance
           .collection('intelligence_reports')
           .add(intelligenceReport.toJson());
-      print('[Pipeline] Successfully exported report to Firestore.');
+      print('[Pipeline] Intelligence report saved to Firestore.');
     } catch (e) {
-      print('[Pipeline Error] Core Pipeline Execution crashed: $e');
+      print('[Pipeline Error] Could not save report to Firestore: $e');
       throw Exception('Core Pipeline Failure: $e');
     }
 
     return intelligenceReport;
   }
 
-  /// THE INTERACTIVE QUERY MODE (Formerly the Cloud Function 'askIntelligenceSystem')
+  /// INTERACTIVE QUERY MODE
   static Future<String> askIntelligenceSystem(String userQuery) async {
-    if (apiKey.isEmpty || apiKey == 'YOUR_TEST_API_KEY_HERE') {
-      throw Exception("Gemini API key is not configured. Missing GEMINI_API_KEY in .env.");
-    }
+    final apiKey = await _requireGeminiApiKey();
     
     if (userQuery.isEmpty) {
       throw Exception('invalid-argument: Query string required.');
@@ -54,7 +69,7 @@ class IntelligencePipelineService {
 
     print('[Query Mode] Interacting with Gemini regarding: "$userQuery"');
 
-    // Grab the latest pipeline Context
+    // Grab the latest pipeline context from Firebase Firestore.
     String contextData = "No recent intelligence baseline available.";
     try {
       final latestSnapshot = await FirebaseFirestore.instance
@@ -64,10 +79,10 @@ class IntelligencePipelineService {
           .get();
 
       if (latestSnapshot.docs.isNotEmpty) {
-        contextData = latestSnapshot.docs[0].data().toString();
+        contextData = latestSnapshot.docs.first.data().toString();
       }
     } catch (e) {
-      print('[Query Mode Error] Could not fetch firestore context: $e');
+      print('[Query Mode Error] Could not fetch Firestore context: $e');
     }
 
     try {

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:conflictsense/features/auth/providers/auth_providers.dart';
-import 'package:conflictsense/features/voice/presentation/voice_assistant_sheet.dart';
 
 class AppShell extends ConsumerWidget {
   const AppShell({
@@ -24,17 +23,6 @@ class AppShell extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('ConflictSense AI'),
         actions: [
-          IconButton(
-            tooltip: 'Voice assistant',
-            onPressed: () {
-              showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) => const VoiceAssistantSheet(),
-              );
-            },
-            icon: const Icon(Icons.mic),
-          ),
           if (user != null)
             IconButton(
               tooltip: 'Sign out',

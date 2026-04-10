@@ -1,11 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
 
-import 'package:conflictsense/core/config/app_config.dart';
 import 'package:conflictsense/core/models/article.dart';
 import 'package:conflictsense/core/models/conflict_report.dart';
 import 'package:conflictsense/core/models/risk_snapshot.dart';
@@ -23,16 +19,9 @@ abstract class ConflictRepository {
 }
 
 class FirestoreConflictRepository implements ConflictRepository {
-  FirestoreConflictRepository(
-    this._firestore, {
-    FirebaseAuth? auth,
-    http.Client? httpClient,
-  })  : _auth = auth ?? FirebaseAuth.instance,
-        _httpClient = httpClient ?? http.Client();
+  FirestoreConflictRepository(this._firestore);
 
   final FirebaseFirestore _firestore;
-  final FirebaseAuth _auth;
-  final http.Client _httpClient;
 
   @override
   Stream<List<Article>> watchLiveArticles(String region) {
@@ -118,28 +107,7 @@ class FirestoreConflictRepository implements ConflictRepository {
 
   @override
   Future<void> refresh(String region) async {
-    final endpoint = buildEndpoint('runConflictPipeline');
-    if (endpoint.isNotEmpty) {
-      try {
-        final idToken = await _auth.currentUser?.getIdToken();
-        final response = await _httpClient.post(
-          Uri.parse(endpoint),
-          headers: {
-            'content-type': 'application/json',
-            if (idToken != null && idToken.isNotEmpty)
-              'authorization': 'Bearer $idToken',
-          },
-          body: jsonEncode({'region': region}),
-        );
-
-        if (response.statusCode < 400) {
-          return;
-        }
-      } catch (_) {
-        // Fall through to Firestore control trigger if backend endpoint is unavailable.
-      }
-    }
-
+    // Client-only mode: signal refresh through Firestore control document.
     await _firestore.collection('controls').doc('refresh').set({
       'region': region,
       'requestedAt': DateTime.now().toIso8601String(),
@@ -222,12 +190,4 @@ class FirestoreConflictRepository implements ConflictRepository {
     if (score >= 45) return 'Medium';
     return 'Low';
   }
-}
-
-String buildEndpoint(String functionPath) {
-  final trimmed = AppConfig.backendBaseUrl.trim();
-  if (trimmed.isEmpty) {
-    return '';
-  }
-  return '$trimmed/$functionPath';
 }

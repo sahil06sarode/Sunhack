@@ -6,7 +6,7 @@ Here's the complete architectural plan for your **ConflictSense AI** Flutter app
 
 ### Tech stack
 - **Frontend:** Flutter (iOS, Android, Web)
-- **Backend/Infra:** Firebase (Firestore, Realtime DB, Cloud Functions, Scheduler, Auth, FCM, Storage)
+- **Backend/Infra:** Firebase (Firestore, Realtime DB, Auth, FCM, Storage)
 - **AI Engine:** Gemini 2.5 Flash via Google AI SDK (agent LLM) + Gemini Live API (voice assistant)
 - **Data APIs:** NewsAPI, Tavily, RSS, optional social signal webhooks
 
@@ -64,7 +64,7 @@ A persistent bottom sheet "Ask ConflictSense" button launches the Gemini Live se
 
 **Fallback logic:** If Gemini API fails or returns malformed JSON, the Predictor agent falls back to a rule-based scorer: count articles by keyword severity tier, apply fixed weights, output rule-based risk level with a `"AI unavailable — rule-based estimate"` flag shown in the UI.
 
-**Error handling:** All Cloud Functions wrap API calls in try/catch with structured error logging to Firebase Crashlytics. Flutter UI uses `AsyncValue` from Riverpod — loading skeletons, error banners with retry buttons, and "Not enough data" empty states when article count < threshold.
+**Error handling:** All app-side data/AI calls wrap API calls in try/catch with structured error logging. Flutter UI uses `AsyncValue` from Riverpod - loading skeletons, error banners with retry buttons, and "Not enough data" empty states when article count < threshold.
 
 **Offline mode:** Firestore persistence enabled. Last known `ConflictReport` cached locally and shown with a "Last synced X minutes ago" banner when offline.
 

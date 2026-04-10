@@ -5,7 +5,7 @@ import 'models.dart';
 
 class AnalyzerAgent {
   static String get apiKey =>
-      dotenv.env['GEMINI_API_KEY'] ?? 'YOUR_TEST_API_KEY_HERE';
+  (dotenv.env['GEMINI_API_KEY'] ?? '').trim();
 
   static Future<List<AnalyzedArticle>> runAnalyzerAgent(
       List<CleanArticle> articles) async {
@@ -13,6 +13,9 @@ class AnalyzerAgent {
         '[Analyzer Agent] Summarizing & Extracting data from ${articles.length} articles via Gemini LLM...');
 
     if (articles.isEmpty) return [];
+    if (apiKey.isEmpty) {
+      throw Exception('[Analyzer Agent] Missing GEMINI_API_KEY in .env.');
+    }
 
     final model =
         GenerativeModel(model: 'gemini-2.5-flash', apiKey: apiKey);

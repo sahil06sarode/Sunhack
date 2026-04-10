@@ -4,11 +4,6 @@ class AppConfig {
     defaultValue: 'models/gemini-live-3.1',
   );
 
-  static const String backendBaseUrl = String.fromEnvironment(
-    'BACKEND_BASE_URL',
-    defaultValue: '',
-  );
-
   static const String defaultRegion = String.fromEnvironment(
     'DEFAULT_REGION',
     defaultValue: 'Global',

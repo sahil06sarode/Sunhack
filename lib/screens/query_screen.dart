@@ -39,7 +39,10 @@ class _QueryScreenState extends State<QueryScreen> {
     } catch (e) {
       debugPrint("Agent Interaction Error: $e");
       setState(() {
-        _messages.add({"role": "ai", "text": "Pipeline Execution Error:\n$e\n\nPlease ensure your E:\\Project\\Sunhack\\.env file is completely correct and that you have fully stopped and restarted the app to load the new config bundles."});
+        _messages.add({
+          "role": "ai",
+          "text": "Pipeline Execution Error:\n$e\n\nPipeline runs in-app and uses Firebase Auth + Firestore for identity and report data. Set required keys in root .env, confirm Firebase is initialized, then fully stop and rerun Flutter because hot reload does not refresh env configuration.",
+        });
       });
     } finally {
       setState(() {

@@ -5,8 +5,8 @@ import 'models.dart';
 
 class CollectorAgent {
   static String get tavilyApiKey =>
-      dotenv.env['TAVILY_API_KEY'] ?? 'YOUR_TAVILY_API_KEY';
-  static String get newsApiKey => dotenv.env['NEWS_API_KEY'] ?? '';
+      (dotenv.env['TAVILY_API_KEY'] ?? '').trim();
+  static String get newsApiKey => (dotenv.env['NEWS_API_KEY'] ?? '').trim();
 
   static Future<List<RawArticle>> runCollectorAgent(
       [String query = 'global conflict']) async {
@@ -14,46 +14,50 @@ class CollectorAgent {
     final List<RawArticle> aggregatedArticles = [];
 
     // 1. TAVILY API SOURCE
-    try {
-      final tavilyRes = await http.post(
-        Uri.parse('https://api.tavily.com/search'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'api_key': tavilyApiKey,
-          'query': 'latest news $query protest conflict tension escalation',
-          'search_depth': 'advanced',
-          'include_images': false,
-          'include_answer': false,
-          'extract_depth': 'basic',
-          'days': 3,
-          'max_results': 5,
-        }),
-      );
+    if (tavilyApiKey.isNotEmpty) {
+      try {
+        final tavilyRes = await http.post(
+          Uri.parse('https://api.tavily.com/search'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'api_key': tavilyApiKey,
+            'query': 'latest news $query protest conflict tension escalation',
+            'search_depth': 'advanced',
+            'include_images': false,
+            'include_answer': false,
+            'extract_depth': 'basic',
+            'days': 3,
+            'max_results': 5,
+          }),
+        );
 
-      if (tavilyRes.statusCode == 200) {
-        final data = jsonDecode(tavilyRes.body);
-        if (data['results'] != null) {
-          int index = 0;
-          for (var result in data['results']) {
-            String sourceName = 'Tavily Source';
-            try {
-              sourceName = Uri.parse(result['url']).host.replaceAll('www.', '');
-            } catch (e) {}
+        if (tavilyRes.statusCode == 200) {
+          final data = jsonDecode(tavilyRes.body);
+          if (data['results'] != null) {
+            int index = 0;
+            for (var result in data['results']) {
+              String sourceName = 'Tavily Source';
+              try {
+                sourceName = Uri.parse(result['url']).host.replaceAll('www.', '');
+              } catch (e) {}
 
-            aggregatedArticles.push(RawArticle(
-              id: 'tavily-${DateTime.now().millisecondsSinceEpoch}-$index',
-              headline: result['title'] ?? 'Intelligence Brief',
-              source: sourceName,
-              url: result['url'] ?? '',
-              timestamp: DateTime.now().toIso8601String(),
-              contentSnippet: result['raw_content'] ?? result['content'] ?? '',
-            ));
-            index++;
+              aggregatedArticles.push(RawArticle(
+                id: 'tavily-${DateTime.now().millisecondsSinceEpoch}-$index',
+                headline: result['title'] ?? 'Intelligence Brief',
+                source: sourceName,
+                url: result['url'] ?? '',
+                timestamp: DateTime.now().toIso8601String(),
+                contentSnippet: result['raw_content'] ?? result['content'] ?? '',
+              ));
+              index++;
+            }
           }
         }
+      } catch (e) {
+        print('[Collector Agent] Tavily fetch failed: $e');
       }
-    } catch (e) {
-      print('[Collector Agent] Tavily fetch failed: $e');
+    } else {
+      print('[Collector Agent] TAVILY_API_KEY is missing in .env. Skipping Tavily source.');
     }
 
     // 2. NEWS API SOURCE

@@ -4,9 +4,6 @@
   "scripts": {
     "frontend": "flutter pub get && flutter run",
     "frontend:dark": "flutter pub get && flutter run --dart-define=SOVEREIGN_DARK=true",
-    "frontend:home": "flutter pub get && flutter run --dart-define=SOVEREIGN_SCREEN=home",
-    "backend": "npm --prefix functions install && npm --prefix functions run serve",
-    "backend:build": "npm --prefix functions run build",
-    "backend:deploy": "npm --prefix functions run deploy"
+    "frontend:home": "flutter pub get && flutter run --dart-define=SOVEREIGN_SCREEN=home"
   }
 }

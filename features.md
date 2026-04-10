@@ -46,7 +46,7 @@ Alert level indicators (color-coded)
 SYSTEM FEATURES (Important but simple)
 Data preprocessing pipeline
 Structured data formatting (JSON)
-API-based backend (FastAPI)
+Firebase-backed data and auth
 LLM integration (OpenAI / Ollama)
 Error handling (no data / API fail)
 Fallback logic (rule-based risk if AI fails)2

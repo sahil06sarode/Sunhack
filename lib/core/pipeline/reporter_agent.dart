@@ -5,7 +5,7 @@ import 'models.dart';
 
 class ReporterAgent {
   static String get apiKey =>
-      dotenv.env['GEMINI_API_KEY'] ?? 'YOUR_TEST_API_KEY_HERE';
+  (dotenv.env['GEMINI_API_KEY'] ?? '').trim();
 
   static Future<IntelligenceReport> runReporterAgent(
       RiskAnalysis analysis, List<AnalyzedArticle> articles) async {
@@ -13,6 +13,9 @@ class ReporterAgent {
         '[Reporter Agent] Compiling final intelligence report via Gemini for ${analysis.primaryLocation}...');
 
     final sources = articles.map((a) => a.url).toList();
+    if (apiKey.isEmpty) {
+      throw Exception('[Reporter Agent] Missing GEMINI_API_KEY in .env.');
+    }
 
     try {
       final model =
