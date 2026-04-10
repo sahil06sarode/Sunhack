@@ -1,0 +1,80 @@
+[debug] [2026-04-10T00:47:01.566Z] ----------------------------------------------------------------------
+[debug] [2026-04-10T00:47:01.568Z] Command:       D:\nodejs\node.exe C:\Users\Sahil\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start --only functions
+[debug] [2026-04-10T00:47:01.568Z] CLI Version:   15.3.1
+[debug] [2026-04-10T00:47:01.568Z] Platform:      win32
+[debug] [2026-04-10T00:47:01.569Z] Node Version:  v24.11.1
+[debug] [2026-04-10T00:47:01.569Z] Time:          Fri Apr 10 2026 06:17:01 GMT+0530 (India Standard Time)
+[debug] [2026-04-10T00:47:01.569Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-10T00:47:03.454Z] Object "" in "firebase.json" has unknown property: {"additionalProperty":"flutter"}
+[debug] [2026-04-10T00:47:03.458Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-10T00:47:03.459Z] > authorizing via signed-in user (sourabh3527@gmail.com)
+[info] i  emulators: Starting emulators: functions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions"}}
+[info] i  emulators: Detected demo project ID "demo-no-project", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail. {"metadata":{"emulator":{"name":"hub"},"message":"Detected demo project ID \"demo-no-project\", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail."}}
+[debug] [2026-04-10T00:47:03.468Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-04-10T00:47:03.468Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2026-04-10T00:47:03.472Z] Write emulator hub locator at C:\Users\Sahil\AppData\Local\Temp\hub-demo-no-project.json
+[debug] [2026-04-10T00:47:03.485Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-04-10T00:47:03.485Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-04-10T00:47:03.485Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-04-10T00:47:03.485Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[debug] [2026-04-10T00:47:03.559Z] defaultcredentials: writing to file C:\Users\Sahil\AppData\Roaming\firebase\sourabh3527_gmail_com_application_default_credentials.json
+[debug] [2026-04-10T00:47:03.561Z] Setting GAC to C:\Users\Sahil\AppData\Roaming\firebase\sourabh3527_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\Sahil\\AppData\\Roaming\\firebase\\sourabh3527_gmail_com_application_default_credentials.json"}}
+[info] i  functions: Watching "E:\Project\Sunhack\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"E:\\Project\\Sunhack\\functions\" for Cloud Functions..."}}
+[debug] [2026-04-10T00:47:03.584Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2026-04-10T00:47:05.728Z] > [functions] package.json contents: {
+  "name": "conflictsense-functions",
+  "version": "0.1.0",
+  "private": true,
+  "main": "lib/index.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint --ext .ts src",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "deploy": "npm run build && firebase deploy --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "eslint": "^9.17.0",
+    "typescript": "^5.7.2"
+  }
+}
+[debug] [2026-04-10T00:47:05.728Z] Building nodejs source
+[debug] [2026-04-10T00:47:05.728Z] Failed to find version of module node: reached end of search path E:\Project\Sunhack\functions\node_modules
+[warn] !  functions: Your requested "node" version "20" doesn't match your global version "24". Using node@24 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-04-10T00:47:05.767Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-04-10T00:47:05.775Z] Found firebase-functions binary at 'E:\Project\Sunhack\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8956
+
+[debug] [2026-04-10T00:47:06.577Z] Got response from /__/functions.yaml {"endpoints":{"ingestNews":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"scheduleTrigger":{"schedule":"every 15 minutes","retryConfig":{"retryCount":null,"maxDoublings":null,"maxRetrySeconds":null,"minBackoffSeconds":null,"maxBackoffSeconds":null},"timeZone":null},"entryPoint":"ingestNews"},"runConflictPipeline":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"runConflictPipeline"},"createGeminiLiveSession":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"createGeminiLiveSession"}},"specVersion":"v1alpha1","requiredAPIs":[{"api":"cloudscheduler.googleapis.com","reason":"Needed for scheduled functions."}],"extensions":{}}
+[info] +  functions: Loaded functions definitions from source: ingestNews, runConflictPipeline, createGeminiLiveSession. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: ingestNews, runConflictPipeline, createGeminiLiveSession."}}
+[info] i  functions[us-central1-ingestNews]: function ignored because the pubsub emulator does not exist or is not running. {"metadata":{"emulator":{"name":"functions"},"message":"function ignored because the pubsub emulator does not exist or is not running."}}
+[info] +  functions[us-central1-runConflictPipeline]: http function initialized (http://127.0.0.1:5001/demo-no-project/us-central1/runConflictPipeline). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/demo-no-project/us-central1/runConflictPipeline)."}}
+[info] +  functions[us-central1-createGeminiLiveSession]: http function initialized (http://127.0.0.1:5001/demo-no-project/us-central1/createGeminiLiveSession). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/demo-no-project/us-central1/createGeminiLiveSession)."}}
+[debug] [2026-04-10T00:47:10.620Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌───────────┬────────────────┬─────────────────────────────────┐
+│ Emulator  │ Host:Port      │ View in Emulator UI             │
+├───────────┼────────────────┼─────────────────────────────────┤
+│ Functions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions │
+└───────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 

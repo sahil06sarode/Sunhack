@@ -27,6 +27,25 @@ ConflictSense AI is a Flutter + Firebase conflict intelligence platform that ing
 
 ## Step-by-step setup
 
+## One-command run (from project root)
+
+Open two terminals in the project root and run:
+
+```bash
+npm run backend
+```
+
+```bash
+npm run frontend
+```
+
+Optional frontend variants:
+
+```bash
+npm run frontend:dark
+npm run frontend:home
+```
+
 ### 1) Install Flutter dependencies
 
 ```bash
