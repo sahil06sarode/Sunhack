@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:conflictsense/core/widgets/report_speaker_button.dart';
 import 'package:conflictsense/screens/feed/models/feed_item.dart';
 
 class FeedDetailPage extends StatelessWidget {
@@ -18,6 +19,11 @@ class FeedDetailPage extends StatelessWidget {
         .split('\n\n')
         .where((paragraph) => paragraph.trim().isNotEmpty)
         .toList();
+    final speechText = [
+      item.title,
+      item.description,
+      item.content,
+    ].where((part) => part.trim().isNotEmpty).join('\n\n');
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F3F5),
@@ -44,6 +50,14 @@ class FeedDetailPage extends StatelessWidget {
                 ),
               ),
             ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
+                child: ReportSpeakerButton(
+                  speechText: speechText,
+                ),
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
